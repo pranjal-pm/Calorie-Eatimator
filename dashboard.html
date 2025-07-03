@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Calorie Analyzer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-color) !important;
+        }
+
+        .upload-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .food-item {
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+
+        .food-item:last-child {
+            border-bottom: none;
+        }
+
+        .calorie-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
+
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: #f8f9fa;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        #preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            width: 3rem;
+            height: 3rem;
+        }
+        
+        /* Additional styling for results */
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .alert {
+            border-radius: 10px;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result-section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .result-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-section h5 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        
+        .total-calories {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Calorie Analyzer</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="upload-section">
+                    <h3 class="mb-4">Analyze Your Meal</h3>
+                    <form id="upload-form" enctype="multipart/form-data">
+                        <div class="upload-area" id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <h4>Drag & Drop or Click to Upload</h4>
+                            <p class="text-muted">Supported formats: JPG, PNG</p>
+                            <input type="file" id="image-input" accept="image/*" style="display: none;">
+                        </div>
+                        <img id="preview-image" style="display: none;">
+                        <div class="loading">
+                            <div class="spinner-border loading-spinner text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Analyzing your meal...</p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="result-card">
+                    <h3 class="mb-4">Analysis Results</h3>
+                    <div id="analysis-results">
+                        <p class="text-muted text-center">Upload an image to see the analysis</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const imageInput = document.getElementById('image-input');
+        const previewImage = document.getElementById('preview-image');
+        const loading = document.querySelector('.loading');
+        const analysisResults = document.getElementById('analysis-results');
+
+        // Handle drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#4CAF50';
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#ddd';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#ddd';
+            const file = e.dataTransfer.files[0];
+            handleImage(file);
+        });
+
+        // Handle click to upload
+        dropZone.addEventListener('click', () => {
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            handleImage(file);
+        });
+
+        function handleImage(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                    analyzeImage(file);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function analyzeImage(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            loading.style.display = 'block';
+            analysisResults.innerHTML = '';
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                displayResults(data);
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                analysisResults.innerHTML = `<div class="alert alert-danger">Error analyzing image: ${error.message}</div>`;
+            });
+        }
+
+        function displayResults(data) {
+            // Validate data structure
+            if (!data) {
+                analysisResults.innerHTML = `<div class="alert alert-danger">Error: No data received from the server</div>`;
+                return;
+            }
+
+            // Check for error message
+            if (data.error) {
+                analysisResults.innerHTML = `
+                    <div class="alert alert-warning">
+                        <h5>Analysis Warning</h5>
+                        <p>${data.error}</p>
+                        <p>We still attempted to analyze the image, but some information may be incomplete.</p>
+                    </div>
+                `;
+            }
+
+            // Ensure food_items is an array
+            const foodItems = Array.isArray(data.food_items) ? data.food_items : [];
+            
+            let html = `
+                <div class="result-section">
+                    <h4 class="d-flex justify-content-between align-items-center">
+                        Total Calories
+                        <span class="calorie-badge total-calories">${data.calories || 'N/A'}</span>
+                    </h4>
+                </div>
+                <div class="result-section">
+                    <h5>Nutritional Value</h5>
+                    <p>${data.nutritional_value || 'No nutritional value information available'}</p>
+                </div>
+                <div class="result-section">
+                    <h5>Health Recommendation</h5>
+                    <p>${data.health_recommendation || 'No health recommendations available'}</p>
+                </div>
+                <div class="result-section">
+                    <h5>Meal Balance</h5>
+                    <p>${data.meal_balance || 'No meal balance information available'}</p>
+                </div>
+                <div class="result-section">
+                    <h5>Suggestions for Improvement</h5>
+                    <p>${data.suggestions || 'No suggestions available'}</p>
+                </div>
+                <div class="result-section">
+                    <h5>Food Items (${foodItems.length})</h5>
+                    ${foodItems.length > 0 ? `
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Food Item</th>
+                                        <th>Calories</th>
+                                        <th>Portion</th>
+                                        <th>Nutrients</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${foodItems.map(item => `
+                                        <tr>
+                                            <td class="fw-bold">${item.name || 'Unknown food item'}</td>
+                                            <td><span class="calorie-badge">${item.calories || 'N/A'}</span></td>
+                                            <td>${item.portion || 'N/A'}</td>
+                                            <td class="small text-muted">${item.nutrients || 'N/A'}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    ` : '<p class="text-muted">No food items identified</p>'}
+                </div>
+            `;
+            analysisResults.innerHTML = html;
+        }
+    </script>
+</body>
+</html> 

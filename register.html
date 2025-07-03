@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Create Your Account</h2>
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" name="age" required min="13" max="120">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="">Select gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="activity_level" class="form-label">Activity Level</label>
+                            <select class="form-select" id="activity_level" name="activity_level" required>
+                                <option value="">Select activity level</option>
+                                <option value="sedentary">Sedentary (little or no exercise)</option>
+                                <option value="light">Lightly active (1-3 days/week)</option>
+                                <option value="moderate">Moderately active (3-5 days/week)</option>
+                                <option value="very">Very active (6-7 days/week)</option>
+                                <option value="extra">Extra active (very active + physical job)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="height" class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="height" name="height" required min="100" max="250">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight" name="weight" required min="30" max="300">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="dietary_restrictions" class="form-label">Dietary Restrictions</label>
+                        <select class="form-select" id="dietary_restrictions" name="dietary_restrictions" multiple>
+                            <option value="none">None</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten_free">Gluten Free</option>
+                            <option value="lactose_free">Lactose Free</option>
+                            <option value="halal">Halal</option>
+                            <option value="kosher">Kosher</option>
+                        </select>
+                        <div class="form-text">Hold Ctrl (Windows) or Command (Mac) to select multiple options</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Create Account</button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-3">
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add client-side validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const height = document.getElementById('height').value;
+        const weight = document.getElementById('weight').value;
+        const age = document.getElementById('age').value;
+
+        if (height < 100 || height > 250) {
+            e.preventDefault();
+            alert('Please enter a valid height between 100 and 250 cm');
+        }
+
+        if (weight < 30 || weight > 300) {
+            e.preventDefault();
+            alert('Please enter a valid weight between 30 and 300 kg');
+        }
+
+        if (age < 13 || age > 120) {
+            e.preventDefault();
+            alert('Please enter a valid age between 13 and 120 years');
+        }
+    });
+</script>
+{% endblock %} 
